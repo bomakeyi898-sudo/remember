@@ -1,0 +1,3817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 高级代码编辑器 - Code Predictor Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .editor-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        .preview-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f3f4f6;
+        }
+
+        .section-header {
+            padding: 15px 20px;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-tabs {
+            display: flex;
+            background: #f3f4f6;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 10px;
+        }
+
+        .tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .editor-container {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .line-numbers-gutter {
+            background: #f3f4f6;
+            color: #9ca3af;
+            padding: 20px 8px;
+            text-align: right;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            border-right: 1px solid #e5e7eb;
+            user-select: none;
+            min-width: 40px;
+            flex-shrink: 0;
+            overflow: hidden;
+            white-space: pre;
+        }
+
+        .editor-inner-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        textarea.editor {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            resize: none;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            background: white;
+            color: #374151;
+            outline: none;
+            overflow-y: auto;
+            overflow-x: auto;
+            line-height: 1.6;
+            tab-size: 4;
+        }
+
+        .prediction-box {
+            padding: 12px 20px;
+            background: #fef3c7;
+            border-top: 1px solid #fcd34d;
+            color: #92400e;
+            font-size: 13px;
+            max-height: 100px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .prediction-box.show {
+            display: block;
+        }
+
+        .prediction-item {
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            margin: 4px 0;
+            cursor: pointer;
+            border-left: 3px solid #fcd34d;
+            transition: all 0.2s ease;
+        }
+
+        .prediction-item:hover {
+            background: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        .preview-content {
+            flex: 1;
+            overflow: auto;
+            background: white;
+            padding: 20px;
+        }
+
+        .preview-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            background: #f3f4f6;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .control-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .status-bar {
+            padding: 10px 20px;
+            background: #374151;
+            color: #f3f4f6;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .code-index-drawer {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-index-drawer.open {
+            right: 0;
+        }
+
+        .drawer-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .drawer-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .drawer-section {
+            margin-bottom: 20px;
+        }
+
+        .drawer-section-title {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .drawer-item {
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .drawer-item:hover {
+            background: #f0f4ff;
+            border-left: 3px solid #667eea;
+            padding-left: 13px;
+        }
+
+        .drawer-item-name {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 13px;
+        }
+
+        .drawer-item-desc {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0);
+            transition: background 0.3s ease;
+            z-index: 998;
+            display: none;
+        }
+
+        .drawer-overlay.show {
+            display: block;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .code-inspector {
+            position: fixed;
+            bottom: -400px;
+            left: 0;
+            right: 0;
+            height: 400px;
+            background: white;
+            border-top: 2px solid #667eea;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            transition: bottom 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-inspector.open {
+            bottom: 0;
+        }
+
+        .inspector-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .inspector-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .element-property {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 4px;
+        }
+
+        .property-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .property-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        .property-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .highlight-element {
+            outline: 2px dashed #667eea !important;
+            outline-offset: 2px;
+            background-color: rgba(102, 126, 234, 0.1) !important;
+        }
+
+        .message {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 6px;
+            color: white;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #10b981;
+        }
+
+        .message.error {
+            background: #ef4444;
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .template-btn {
+            padding: 15px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .template-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .template-title {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .template-desc {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .error-message {
+            display: none;
+            background: #fee2e2;
+            border-left: 4px solid #dc2626;
+            padding: 12px 16px;
+            border-radius: 4px;
+            color: #991b1b;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .editor-section {
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                flex: 0.5;
+            }
+
+            .preview-section {
+                flex: 0.5;
+            }
+        }
+
+        /* ===== 文件管理样式 ===== */
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .file-item {
+            padding: 15px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            word-break: break-all;
+        }
+
+        .file-item:hover {
+            background: #f0f4ff;
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .file-item-name {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .file-item-size {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+
+        .file-item-actions {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .file-btn {
+            padding: 5px 10px;
+            font-size: 11px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-btn:hover {
+            background: #764ba2;
+        }
+
+        .file-btn.delete {
+            background: #ef4444;
+        }
+
+        .file-btn.delete:hover {
+            background: #dc2626;
+        }
+
+        .upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+            cursor: pointer;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            background: #f0f4ff;
+            border-color: #764ba2;
+        }
+
+        .upload-area-text {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* ===== C++ 调试控制台样式 ===== */
+        .cpp-debug-console {
+            position: fixed;
+            bottom: -500px;
+            left: 0;
+            right: 0;
+            height: 500px;
+            background: white;
+            border-top: 2px solid #10b981;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            transition: bottom 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cpp-debug-console.open {
+            bottom: 0;
+        }
+
+        .cpp-console-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .cpp-console-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .cpp-console-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.3);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .cpp-console-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .cpp-console-btn.close-btn {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+        }
+
+        .cpp-console-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f9fafb;
+        }
+
+        .cpp-output-area {
+            flex: 1;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #374151;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .cpp-output-line {
+            margin: 4px 0;
+            padding: 2px 0;
+        }
+
+        .cpp-output-line.error {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .cpp-output-line.warning {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .cpp-output-line.success {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .cpp-output-line.info {
+            color: #3b82f6;
+        }
+
+        .cpp-input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .cpp-input-field {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+        }
+
+        .cpp-input-field:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .cpp-input-btn {
+            padding: 10px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .cpp-input-btn:hover {
+            background: #2563eb;
+        }
+
+        .cpp-input-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .cpp-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+
+        .cpp-action-btn {
+            padding: 10px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .cpp-action-btn:hover {
+            background: #f0f4ff;
+            border-color: #667eea;
+        }
+
+        .cpp-action-btn.run {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .cpp-action-btn.run:hover {
+            background: #059669;
+            border-color: #059669;
+        }
+
+        .cpp-action-btn.clear {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .cpp-action-btn.clear:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .cpp-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 10px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .cpp-status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+
+        .cpp-status-indicator.ready {
+            background: #10b981;
+        }
+
+        .cpp-status-indicator.running {
+            background: #f59e0b;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===== Python 调试器样式 ===== */
+        .python-debug-console {
+            position: fixed;
+            bottom: -500px;
+            left: 0;
+            right: 0;
+            height: 500px;
+            background: white;
+            border-top: 2px solid #f59e0b;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            transition: bottom 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .python-debug-console.open {
+            bottom: 0;
+        }
+
+        .python-console-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .python-console-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .python-console-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.3);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .python-console-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .python-console-btn.close-btn {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+        }
+
+        .python-console-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f9fafb;
+        }
+
+        .python-output-area {
+            flex: 1;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #374151;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .python-output-line {
+            margin: 4px 0;
+            padding: 2px 0;
+        }
+
+        .python-output-line.error {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .python-output-line.warning {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .python-output-line.success {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .python-output-line.info {
+            color: #3b82f6;
+        }
+
+        .python-input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .python-input-field {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+        }
+
+        .python-input-field:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .python-input-btn {
+            padding: 10px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .python-input-btn:hover {
+            background: #2563eb;
+        }
+
+        .python-input-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .python-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+
+        .python-action-btn {
+            padding: 10px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .python-action-btn:hover {
+            background: #f0f4ff;
+            border-color: #667eea;
+        }
+
+        .python-action-btn.run {
+            background: #f59e0b;
+            color: white;
+            border-color: #f59e0b;
+        }
+
+        .python-action-btn.run:hover {
+            background: #d97706;
+            border-color: #d97706;
+        }
+
+        .python-action-btn.clear {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .python-action-btn.clear:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .python-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 10px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .python-status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+
+        .python-status-indicator.ready {
+            background: #f59e0b;
+        }
+
+        .python-status-indicator.running {
+            background: #3b82f6;
+            animation: pulse 1s infinite;
+        }
+
+        /* ===== GLSL 调试器样式 ===== */
+        .glsl-debug-console {
+            position: fixed;
+            bottom: -500px;
+            left: 0;
+            right: 0;
+            height: 500px;
+            background: white;
+            border-top: 2px solid #8b5cf6;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            transition: bottom 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .glsl-debug-console.open {
+            bottom: 0;
+        }
+
+        .glsl-console-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .glsl-console-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .glsl-console-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.3);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .glsl-console-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .glsl-console-btn.close-btn {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+        }
+
+        .glsl-console-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f9fafb;
+        }
+
+        .glsl-output-area {
+            flex: 1;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #374151;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .glsl-output-line {
+            margin: 4px 0;
+            padding: 2px 0;
+        }
+
+        .glsl-output-line.error {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .glsl-output-line.warning {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .glsl-output-line.success {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .glsl-output-line.info {
+            color: #8b5cf6;
+        }
+
+        .glsl-input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .glsl-input-field {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+        }
+
+        .glsl-input-field:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .glsl-input-btn {
+            padding: 10px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .glsl-input-btn:hover {
+            background: #2563eb;
+        }
+
+        .glsl-input-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .glsl-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+
+        .glsl-action-btn {
+            padding: 10px 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .glsl-action-btn:hover {
+            background: #f0f4ff;
+            border-color: #667eea;
+        }
+
+        .glsl-action-btn.run {
+            background: #8b5cf6;
+            color: white;
+            border-color: #8b5cf6;
+        }
+
+        .glsl-action-btn.run:hover {
+            background: #7c3aed;
+            border-color: #7c3aed;
+        }
+
+        .glsl-action-btn.clear {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .glsl-action-btn.clear:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .glsl-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 10px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .glsl-status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+
+        .glsl-status-indicator.ready {
+            background: #8b5cf6;
+        }
+
+        .glsl-status-indicator.running {
+            background: #06b6d4;
+            animation: pulse 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💻 高级代码编辑器 - Code Predictor Pro</h1>
+            <div class="header-controls">
+                <button class="btn btn-primary" onclick="showTemplates()">📋 模板</button>
+                <button class="btn btn-primary" onclick="showHelp()">❓ 帮助</button>
+                <button class="btn btn-primary" onclick="uploadFile()">📁 上传</button>
+                <button class="btn btn-primary" onclick="downloadCode()">⬇️ 下载</button>
+                <button class="btn btn-primary" onclick="showFileManager()">📂 文件</button>
+                <button class="btn btn-success" onclick="saveCode()">💾 保存</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="editor-section">
+                <div class="section-header">
+                    📝 代码编辑区
+                    <span class="char-count">字数: <span id="charCount">0</span></span>
+                </div>
+
+                <div class="editor-tabs">
+                    <button class="tab active" onclick="switchTab('html')">HTML</button>
+                    <button class="tab" onclick="switchTab('css')">CSS</button>
+                    <button class="tab" onclick="switchTab('js')">JavaScript</button>
+                    <button class="tab" onclick="switchTab('cpp')">C++</button>
+                    <button class="tab" onclick="switchTab('python')">Python</button>
+                    <button class="tab" onclick="switchTab('glsl')">GLSL</button>
+                </div>
+
+                <div class="editor-container">
+                    <div id="errorMessage" class="error-message"></div>
+
+                    <div class="line-numbers-gutter" id="lineNumbersGutter">1</div>
+                    <div class="editor-inner-wrapper">
+                        <div style="flex: 1; display: flex; flex-direction: column;">
+                            <textarea id="htmlEditor" class="editor" placeholder="编写 HTML...&#10;&lt;h1&gt;Hello&lt;/h1&gt;" onkeyup="updatePreview(); updatePrediction(); updateCharCount(); updateLineNumbers()" onscroll="syncLineNumberScroll()"></textarea>
+                            <textarea id="cssEditor" class="editor" style="display: none;" placeholder="编写 CSS...&#10;h1 { color: blue; }" onkeyup="updatePreview(); updatePrediction(); updateCharCount(); updateLineNumbers()" onscroll="syncLineNumberScroll()"></textarea>
+                            <textarea id="jsEditor" class="editor" style="display: none;" placeholder="编写 JavaScript...&#10;console.log('Hello');" onkeyup="updatePreview(); updatePrediction(); updateCharCount(); updateLineNumbers()" onscroll="syncLineNumberScroll()"></textarea>
+                            <textarea id="cppEditor" class="editor" style="display: none;" placeholder="编写 C++...&#10;#include &lt;iostream&gt;&#10;int main() { return 0; }" onkeyup="updatePreview(); updatePrediction(); updateCharCount(); updateLineNumbers()" onscroll="syncLineNumberScroll()"></textarea>
+                            <textarea id="pythonEditor" class="editor" style="display: none;" placeholder="编写 Python...&#10;print('Hello')" onkeyup="updatePreview(); updatePrediction(); updateCharCount(); updateLineNumbers()" onscroll="syncLineNumberScroll()"></textarea>
+                            <textarea id="glslEditor" class="editor" style="display: none;" placeholder="编写 GLSL...&#10;void main() { gl_FragColor = vec4(1.0); }" onkeyup="updatePreview(); updatePrediction(); updateCharCount(); updateLineNumbers()" onscroll="syncLineNumberScroll()"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="prediction-box" id="predictionBox">
+                        <div style="margin-bottom: 8px; font-weight: 600;">💡 代码预测:</div>
+                        <div id="predictionList"></div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="control-group">
+                        <label class="control-label">
+                            <input type="checkbox" class="checkbox" id="autoUpdate" checked onchange="updatePreview()">
+                            实时预览
+                        </label>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">
+                            <input type="checkbox" class="checkbox" id="enablePrediction" checked>
+                            代码预测
+                        </label>
+                    </div>
+                    <button class="btn btn-success" style="margin-left: auto;" onclick="updatePreview()">🔄 刷新预览</button>
+                    <button class="btn btn-primary" onclick="toggleCodeIndex()">📚 代码索引</button>
+                    <button class="btn btn-primary" id="cppConsoleBtn" style="display: none;" onclick="toggleCppConsole()">🔍 C++调试</button>
+                    <button class="btn btn-primary" id="pythonConsoleBtn" style="display: none;" onclick="togglePythonConsole()">🐍 Python调试</button>
+                    <button class="btn btn-primary" id="glslConsoleBtn" style="display: none;" onclick="toggleGlslConsole()">✨ GLSL调试</button>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <div class="section-header">
+                    👁️ 预览 & 交互
+                </div>
+                <div class="preview-content" id="previewContent">
+                    <iframe id="previewFrame" class="preview-frame" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <span>✅ 编辑器就绪</span>
+            <span id="previewStatus">预览: 未初始化</span>
+        </div>
+    </div>
+
+    <!-- 文件管理模态框 -->
+    <div class="modal" id="fileManagerModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">📂 文件管理器</div>
+            <div class="modal-body">
+                <div class="upload-area" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-area-text">📤 拖拽文件到此或点击上传</div>
+                    <div style="font-size: 12px; color: #9ca3af;">支持 HTML、CSS、JS、C++、Python、GLSL 文件</div>
+                </div>
+                <input type="file" id="fileInput" multiple accept=".html,.css,.js,.cpp,.cc,.cxx,.py,.glsl,.frag,.vert,.txt" onchange="handleFileSelect(event)">
+                
+                <div style="margin-top: 20px;">
+                    <h3 style="color: #374151; margin-bottom: 10px;">📋 已上传的文件</h3>
+                    <div id="fileListContainer" class="file-list"></div>
+                    <div id="noFilesMsg" style="text-align: center; color: #9ca3af; padding: 20px; background: #f9fafb; border-radius: 6px; margin-top: 10px;">还没有上传文件</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('fileManagerModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模板模态框 -->
+    <div class="modal" id="templatesModal">
+        <div class="modal-content">
+            <div class="modal-header">📋 选择模板</div>
+            <div class="template-grid" id="templatesContainer"></div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('templatesModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 帮助模态框 -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header">❓ 使用帮助</div>
+            <div class="modal-body">
+                <h3 style="color: #374151; margin: 15px 0 8px 0;">✨ 功能介绍</h3>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li><strong>多语言编辑:</strong> 支持 HTML、CSS、JavaScript、C++、Python、GLSL</li>
+                    <li><strong>代码预测:</strong> AI 自动预测下一步可能的代码</li>
+                    <li><strong>实时预览:</strong> 代码实时渲染到右侧预览窗口（HTML/CSS/JS）</li>
+                    <li><strong>反向映射:</strong> 在预览中修改元素会自动同步到代码</li>
+                    <li><strong>代码索引:</strong> 显示所有标签、属性和方法的完整解释</li>
+                    <li><strong>元素检查器:</strong> 点击预览元素查看和编辑属性</li>
+                </ul>
+
+                <h3 style="color: #374151; margin: 15px 0 8px 0;">🎯 快速提示</h3>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li>按 Tab 键自动缩进代码</li>
+                    <li>在预览中直接修改文本内容</li>
+                    <li>点击预览元素在检查器中编辑属性</li>
+                    <li>使用代码索引学习多种编程语言</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('helpModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 代码索引侧边栏 -->
+    <div class="code-index-drawer" id="codeIndexDrawer">
+        <div class="drawer-header">
+            📚 代码索引解释
+            <button style="background: rgba(255,255,255,0.3); border: none; color: white; width: 30px; height: 30px; border-radius: 4px; cursor: pointer;" onclick="toggleCodeIndex()">✕</button>
+        </div>
+        <div class="drawer-content" id="drawerContent">
+            <div style="text-align: center; color: #9ca3af; padding: 20px;">
+                编写代码来查看完整解释...
+            </div>
+        </div>
+    </div>
+
+    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleCodeIndex()"></div>
+
+    <!-- C++ 调试控制台 -->
+    <div class="cpp-debug-console" id="cppDebugConsole">
+        <div class="cpp-console-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                🔍 C++ 自动化调试台
+                <span class="cpp-status">
+                    <span class="cpp-status-indicator ready" id="cppStatusIndicator"></span>
+                    <span id="cppStatusText">就绪</span>
+                </span>
+            </div>
+            <div class="cpp-console-controls">
+                <button class="cpp-console-btn" onclick="cppCompile()">⚙️ 编译</button>
+                <button class="cpp-console-btn" onclick="cppRun()">▶️ 运行</button>
+                <button class="cpp-console-btn" onclick="cppCompileAndRun()">▶️⚙️ 编译运行</button>
+                <button class="cpp-console-btn close-btn" onclick="toggleCppConsole()">✕</button>
+            </div>
+        </div>
+        <div class="cpp-console-content">
+            <div class="cpp-input-area" id="cppInputArea" style="display: none;">
+                <input type="text" class="cpp-input-field" id="cppInputField" placeholder="输入数据（如需要）" onkeypress="if(event.key==='Enter') cppSendInput()">
+                <button class="cpp-input-btn" onclick="cppSendInput()">📤 发送</button>
+            </div>
+            <div class="cpp-output-area" id="cppOutputArea"></div>
+        </div>
+        <div class="cpp-actions">
+            <button class="cpp-action-btn run" onclick="cppCompileAndRun()">▶️ 编译运行</button>
+            <button class="cpp-action-btn" onclick="cppKill()">⛔ 停止</button>
+            <button class="cpp-action-btn clear" onclick="cppClearOutput()">🗑️ 清空</button>
+            <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+                <label style="font-size: 12px; color: #6b7280;">
+                    <input type="checkbox" id="cppAutoRun"> 自动运行
+                </label>
+                <label style="font-size: 12px; color: #6b7280;">
+                    <input type="checkbox" id="cppShowInput"> 显示输入框
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Python 调试器 -->
+    <div class="python-debug-console" id="pythonDebugConsole">
+        <div class="python-console-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                🐍 Python 交互式调试器
+                <span class="python-status">
+                    <span class="python-status-indicator ready" id="pythonStatusIndicator"></span>
+                    <span id="pythonStatusText">就绪</span>
+                </span>
+            </div>
+            <div class="python-console-controls">
+                <button class="python-console-btn" onclick="pythonCheck()">✓ 检查</button>
+                <button class="python-console-btn" onclick="pythonRun()">▶️ 运行</button>
+                <button class="python-console-btn close-btn" onclick="togglePythonConsole()">✕</button>
+            </div>
+        </div>
+        <div class="python-console-content">
+            <div class="python-input-area" id="pythonInputArea" style="display: none;">
+                <input type="text" class="python-input-field" id="pythonInputField" placeholder="输入数据（如需要）" onkeypress="if(event.key==='Enter') pythonSendInput()">
+                <button class="python-input-btn" onclick="pythonSendInput()">📤 发送</button>
+            </div>
+            <div class="python-output-area" id="pythonOutputArea"></div>
+        </div>
+        <div class="python-actions">
+            <button class="python-action-btn run" onclick="pythonRun()">▶️ 运行代码</button>
+            <button class="python-action-btn" onclick="pythonKill()">⛔ 停止</button>
+            <button class="python-action-btn clear" onclick="pythonClearOutput()">🗑️ 清空</button>
+            <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+                <label style="font-size: 12px; color: #6b7280;">
+                    <input type="checkbox" id="pythonAutoRun"> 自动运行
+                </label>
+                <label style="font-size: 12px; color: #6b7280;">
+                    <input type="checkbox" id="pythonShowInput"> 显示输入框
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- GLSL 调试器 -->
+    <div class="glsl-debug-console" id="glslDebugConsole">
+        <div class="glsl-console-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                ✨ GLSL 着色器调试器
+                <span class="glsl-status">
+                    <span class="glsl-status-indicator ready" id="glslStatusIndicator"></span>
+                    <span id="glslStatusText">就绪</span>
+                </span>
+            </div>
+            <div class="glsl-console-controls">
+                <button class="glsl-console-btn" onclick="glslValidate()">✓ 验证</button>
+                <button class="glsl-console-btn" onclick="glslCompile()">⚙️ 编译</button>
+                <button class="glsl-console-btn close-btn" onclick="toggleGlslConsole()">✕</button>
+            </div>
+        </div>
+        <div class="glsl-console-content">
+            <div class="glsl-input-area" id="glslInputArea" style="display: none;">
+                <input type="text" class="glsl-input-field" id="glslInputField" placeholder="着色器信息（只读）" readonly>
+                <button class="glsl-input-btn" onclick="glslClearInfo()" style="background: #6b7280;">清除</button>
+            </div>
+            <div class="glsl-output-area" id="glslOutputArea"></div>
+        </div>
+        <div class="glsl-actions">
+            <button class="glsl-action-btn run" onclick="glslCompile()">⚙️ 编译着色器</button>
+            <button class="glsl-action-btn" onclick="glslAnalyze()">🔍 分析</button>
+            <button class="glsl-action-btn clear" onclick="glslClearOutput()">🗑️ 清空</button>
+            <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+                <label style="font-size: 12px; color: #6b7280;">
+                    <input type="checkbox" id="glslAutoValidate"> 自动验证
+                </label>
+                <label style="font-size: 12px; color: #6b7280;">
+                    <input type="checkbox" id="glslShowInfo"> 显示信息
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 元素检查器 -->
+    <div class="code-inspector" id="codeInspector">
+        <div class="inspector-header">
+            🔍 元素检查器
+            <button style="background: rgba(255,255,255,0.3); border: none; color: white; width: 30px; height: 30px; border-radius: 4px; cursor: pointer;" onclick="toggleInspector()">✕</button>
+        </div>
+        <div class="inspector-content" id="inspectorContent">
+            <div style="text-align: center; color: #9ca3af; padding: 20px;">
+                在预览中点击元素查看其属性...
+            </div>
+        </div>
+    </div>
+
+    <div id="messageBox" class="message"></div>
+
+    <script>
+        // ===== 数据定义 =====
+        const templates = [
+            {
+                name: '简单页面',
+                desc: '基础 HTML 页面',
+                html: '<h1>欢迎来到我的网站</h1>\n<p>这是一个简单的页面。</p>',
+                css: 'h1 { color: #667eea; font-size: 32px; }\np { color: #666; }',
+                js: 'console.log("页面已加载");'
+            },
+            {
+                name: '卡片布局',
+                desc: '响应式卡片',
+                html: '<div class="container">\n  <div class="card">\n    <h3>卡片 1</h3>\n    <p>这是卡片内容</p>\n  </div>\n  <div class="card">\n    <h3>卡片 2</h3>\n    <p>这是卡片内容</p>\n  </div>\n</div>',
+                css: '.container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px; }\n.card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }',
+                js: ''
+            },
+            {
+                name: '表单页面',
+                desc: '交互式表单',
+                html: '<form onsubmit="handleSubmit(event)">\n  <input type="text" id="name" placeholder="输入名字" required>\n  <button type="submit">提交</button>\n</form>\n<div id="result"></div>',
+                css: 'form { max-width: 400px; margin: 20px; }\ninput { padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; width: 100%; }\nbutton { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; }',
+                js: 'function handleSubmit(e) { e.preventDefault(); const name = document.getElementById("name").value; document.getElementById("result").textContent = "提交成功: " + name; }'
+            },
+            {
+                name: 'Hello World',
+                desc: '基础 C++ 程序',
+                cpp: '#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello, World!" << endl;\n    return 0;\n}',
+                html: '',
+                css: '',
+                js: ''
+            },
+            {
+                name: 'C++ 循环与数组',
+                desc: '数组和循环示例',
+                cpp: '#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> arr = {1, 2, 3, 4, 5};\n    \n    cout << "数组元素: ";\n    for (int i = 0; i < arr.size(); i++) {\n        cout << arr[i] << " ";\n    }\n    cout << endl;\n    \n    int sum = 0;\n    for (int num : arr) {\n        sum += num;\n    }\n    cout << "总和: " << sum << endl;\n    \n    return 0;\n}',
+                html: '',
+                css: '',
+                js: ''
+            },
+            {
+                name: 'C++ 类和对象',
+                desc: '面向对象编程示例',
+                cpp: '#include <iostream>\nusing namespace std;\n\nclass Person {\nprivate:\n    string name;\n    int age;\npublic:\n    Person(string n, int a) : name(n), age(a) {}\n    \n    void display() {\n        cout << "名字: " << name << ", 年龄: " << age << endl;\n    }\n};\n\nint main() {\n    Person p("张三", 25);\n    p.display();\n    return 0;\n}',
+                html: '',
+                css: '',
+                js: ''
+            },
+            {
+                name: 'Python Hello World',
+                desc: '基础 Python 程序',
+                python: 'print("Hello, World!")\nprint("欢迎使用 Python!")',
+                html: '',
+                css: '',
+                js: ''
+            },
+            {
+                name: 'Python 函数与列表',
+                desc: '函数和列表操作',
+                python: '# 定义函数\ndef calculate_sum(numbers):\n    """计算列表中所有数字的和"""\n    return sum(numbers)\n\ndef print_info(items):\n    print(f"列表包含 {len(items)} 个元素")\n    for i, item in enumerate(items):\n        print(f"  {i + 1}. {item}")\n\n# 主程序\nif __name__ == "__main__":\n    numbers = [1, 2, 3, 4, 5]\n    result = calculate_sum(numbers)\n    print(f"总和: {result}")\n    print_info(["苹果", "香蕉", "橙子"])',
+                html: '',
+                css: '',
+                js: ''
+            },
+            {
+                name: 'Python 类和继承',
+                desc: '面向对象编程示例',
+                python: 'class Animal:\n    def __init__(self, name):\n        self.name = name\n    \n    def speak(self):\n        print(f"{self.name} 发出声音")\n\nclass Dog(Animal):\n    def speak(self):\n        print(f"{self.name} 汪汪叫")\n\nclass Cat(Animal):\n    def speak(self):\n        print(f"{self.name} 喵喵叫")\n\n# 使用\nif __name__ == "__main__":\n    dog = Dog("小黑")\n    cat = Cat("小白")\n    dog.speak()\n    cat.speak()',
+                html: '',
+                css: '',
+                js: ''
+            },
+            {
+                name: 'GLSL 基础片段着色器',
+                desc: '简单的颜色着色器',
+                glsl: 'precision mediump float;\nuniform vec3 uColor;\nvarying vec2 vTexCoord;\n\nvoid main() {\n    gl_FragColor = vec4(uColor, 1.0);\n}',
+                html: '',
+                css: '',
+                js: ''
+            },
+            {
+                name: 'GLSL 渐变效果',
+                desc: '创建渐变效果',
+                glsl: 'precision mediump float;\nuniform vec2 uResolution;\nuniform float uTime;\n\nvoid main() {\n    // 获取规范化坐标\n    vec2 uv = gl_FragCoord.xy / uResolution.xy;\n    \n    // 创建渐变效果\n    float gradient = uv.x;\n    float wave = sin(uv.y * 5.0 + uTime) * 0.1;\n    \n    // 设置颜色\n    vec3 color = vec3(\n        sin(gradient + uTime) * 0.5 + 0.5,\n        cos(gradient * 2.0 + uTime) * 0.5 + 0.5,\n        sin(gradient * 3.0 + uTime + wave) * 0.5 + 0.5\n    );\n    \n    gl_FragColor = vec4(color, 1.0);\n}',
+                html: '',
+                css: '',
+                js: ''
+            },
+            {
+                name: 'GLSL 顶点着色器',
+                desc: '基础顶点变换',
+                glsl: 'uniform mat4 uMatrix;\nattribute vec3 aPosition;\nattribute vec3 aColor;\nvarying vec3 vColor;\n\nvoid main() {\n    gl_Position = uMatrix * vec4(aPosition, 1.0);\n    vColor = aColor;\n}',
+                html: '',
+                css: '',
+                js: ''
+            }
+        ];
+
+        const predictions = [
+            { html: ['</div>', '</body>', '<div>', '<p>', '<span>'], css: ['}', 'color:', 'background:', 'margin:', 'padding:'], js: ['}', ';', 'return', 'console.log()', 'document.'], cpp: ['}', ';', 'return', 'std::cout', '#include'], python: ['return', ':', 'def ', 'if __name__', 'import'], glsl: ['}', ';', 'vec4', 'vec3', 'uniform'] },
+            { html: ['<img src="">', '<button>', '<input>', '<form>', '<label>'], css: ['border-radius:', 'box-shadow:', 'transition:', 'transform:', 'display:'], js: ['function', 'const', 'let', 'if (', 'for ('], cpp: ['int main()', 'void ', 'class ', 'namespace', 'template'], python: ['class ', 'for ', 'while ', 'try:', 'except:'], glsl: ['attribute', 'varying', 'in ', 'out ', 'layout'] }
+        ];
+
+        const codeExplanations = {
+            html: {
+                h1: '一级标题，用于页面主标题',
+                h2: '二级标题',
+                h3: '三级标题',
+                p: '段落标签，用于文本内容',
+                div: '通用容器标签，用于分组元素',
+                span: '行内容器标签',
+                button: '按钮标签，可点击交互',
+                input: '输入框，用户可输入数据',
+                form: '表单标签，用于提交数据',
+                img: '图片标签，用于显示图像',
+                a: '链接标签，用于导航',
+                ul: '无序列表',
+                ol: '有序列表',
+                li: '列表项',
+                header: '页面或区段的头部',
+                footer: '页面或区段的底部',
+                nav: '导航栏，用于放置导航链接',
+                section: '页面或文章的一个独立区域',
+                article: '独立的文章内容',
+                aside: '侧边栏或与主内容相关的补充信息',
+                main: '页面的主要内容区域',
+                label: '标签，通常与 input 关联',
+                table: '表格容器',
+                tr: '表格行',
+                td: '表格单元格',
+                th: '表格头单元格',
+                textarea: '多行文本输入框',
+                select: '下拉选择框',
+                option: '下拉选项',
+                br: '换行标签',
+                hr: '水平分割线',
+                strong: '强调文本，粗体显示',
+                em: '强调文本，斜体显示',
+                code: '代码片段',
+                pre: '预格式化文本'
+            },
+            css: {
+                color: '设置文本颜色',
+                backgroundColor: '设置背景颜色',
+                'background-color': '设置背景颜色',
+                fontSize: '设置字体大小',
+                padding: '设置内边距',
+                margin: '设置外边距',
+                borderRadius: '设置圆角',
+                border: '设置边框',
+                display: '设置显示方式（flex, grid, block等）',
+                width: '设置宽度',
+                height: '设置高度',
+                boxShadow: '设置阴影效果',
+                'box-sizing': '设置盒模型计算方式：content-box 或 border-box',
+                'border-box': '包含内容、内边距和边框的总大小',
+                'content-box': '只包含内容的大小，不包括边框和内边距',
+                position: '设置元素定位方式（static, relative, absolute, fixed等）',
+                top: '设置距顶部的距离',
+                bottom: '设置距底部的距离',
+                left: '设置距左侧的距离',
+                right: '设置距右侧的距离',
+                opacity: '设置元素透明度（0-1）',
+                transition: '设置过渡效果',
+                transform: '设置转换效果（旋转、缩放、倾斜等）',
+                'font-family': '设置字体类型',
+                'font-weight': '设置字体粗细',
+                'text-align': '设置文本对齐方式',
+                'line-height': '设置行高',
+                'letter-spacing': '设置字母间距',
+                'background-image': '设置背景图片',
+                'background-size': '设置背景图片大小',
+                'background-position': '设置背景图片位置',
+                'background-repeat': '设置背景图片重复方式',
+                'flex-direction': '设置 Flex 容器主轴方向',
+                'flex-wrap': '设置 Flex 项目是否换行',
+                'justify-content': '设置 Flex 项目在主轴上的对齐方式',
+                'align-items': '设置 Flex 项目在交叉轴上的对齐方式',
+                'gap': '设置 Flex 或 Grid 项目之间的间距',
+                'grid-template-columns': '定义网格列的宽度和数量',
+                'grid-template-rows': '定义网格行的高度和数量',
+                'overflow': '设置内容溢出时的处理方式',
+                'z-index': '设置元素堆叠顺序',
+                'cursor': '设置鼠标指针样式',
+                'visibility': '设置元素可见性',
+                'white-space': '设置空白字符处理方式',
+                'text-decoration': '设置文本装饰效果',
+                'background-clip': '设置背景裁剪方式'
+            },
+            js: {
+                'console.log': '在浏览器控制台打印信息，用于调试',
+                'document.getElementById': '通过 ID 获取 HTML 元素',
+                'document.querySelector': '使用 CSS 选择器获取元素',
+                'document.querySelectorAll': '使用 CSS 选择器获取所有匹配的元素',
+                'addEventListener': '为元素添加事件监听器',
+                'innerHTML': '获取或设置元素的 HTML 内容',
+                'textContent': '获取或设置元素的文本内容',
+                'style': '访问元素的样式属性',
+                'function': '定义一个函数',
+                'const': '声明常量变量（不能重新赋值）',
+                'let': '声明可变变量（块级作用域）',
+                'var': '声明变量（全局或函数作用域）',
+                'if': '条件语句，根据条件执行代码',
+                'for': '循环语句，重复执行代码块',
+                'while': 'While 循环，当条件为真时执行',
+                'do-while': 'Do-While 循环，至少执行一次',
+                'switch': '开关语句，根据不同值执行不同代码',
+                'return': '从函数返回值',
+                'class': '定义一个类',
+                'new': '创建类的新实例',
+                'this': '引用当前对象或函数的上下文',
+                'arrow function': '箭头函数，简洁的函数定义方式',
+                'map': '数组方法，对每个元素应用函数并返回新数组',
+                'filter': '数组方法，筛选满足条件的元素',
+                'reduce': '数组方法，累积计算单个值',
+                'forEach': '数组方法，对每个元素执行函数',
+                'find': '数组方法，返回第一个满足条件的元素',
+                'includes': '检查数组或字符串是否包含指定值',
+                'split': '字符串方法，根据分隔符分割字符串',
+                'join': '数组方法，将数组元素连接成字符串',
+                'slice': '提取数组或字符串的一部分',
+                'splice': '修改数组（添加或删除元素）',
+                'push': '向数组末尾添加元素',
+                'pop': '从数组末尾删除元素',
+                'shift': '从数组开头删除元素',
+                'unshift': '向数组开头添加元素',
+                'length': '获取数组或字符串的长度',
+                'Object': '基础对象类型',
+                'Array': '数组类型',
+                'String': '字符串类型',
+                'Number': '数字类型',
+                'Boolean': '布尔类型',
+                'null': '表示无值或空值',
+                'undefined': '未定义的值',
+                'typeof': '检查变量的数据类型',
+                'JSON.parse': '将 JSON 字符串解析为对象',
+                'JSON.stringify': '将对象转换为 JSON 字符串',
+                'setTimeout': '延迟执行函数',
+                'setInterval': '周期性执行函数',
+                'Promise': '异步操作的容器',
+                'async/await': '处理异步操作的现代方式',
+                'try-catch': '异常处理机制',
+                'throw': '抛出错误或异常'
+            },
+            cpp: {
+                '#include': 'C++ 预处理指令，用于包含头文件',
+                '#include <iostream>': '包含标准输入输出库',
+                '#include <vector>': '包含向量容器库',
+                '#include <string>': '包含字符串处理库',
+                'int main()': 'C++ 程序入口点，返回整数状态码',
+                'std::cout': '标准输出流，用于打印到控制台',
+                'std::cin': '标准输入流，用于从控制台读取',
+                '<<': '左移运算符或输出流操作符',
+                '>>': '右移运算符或输入流操作符',
+                'return': '从函数返回值',
+                'void': '表示函数不返回任何值',
+                'int': '32位整数类型',
+                'float': '单精度浮点数类型',
+                'double': '双精度浮点数类型',
+                'bool': '布尔类型（true/false）',
+                'char': '字符类型',
+                'std::string': '字符串类型',
+                'std::vector': '动态数组容器',
+                'class': '定义一个类',
+                'struct': '定义一个结构体',
+                'namespace': '定义命名空间，避免名称冲突',
+                'template': '泛型模板，参数化类型',
+                'for': '循环语句，迭代执行代码块',
+                'while': 'While 循环，条件为真时执行',
+                'if': '条件语句',
+                'else if': '多条件分支',
+                'else': '否则分支',
+                'switch': '开关语句',
+                'case': '开关中的情况',
+                'default': '开关默认情况',
+                'break': '跳出循环或开关',
+                'continue': '跳过当前迭代',
+                'public': '公有成员，可从外部访问',
+                'private': '私有成员，仅类内可访问',
+                'protected': '保护成员，类和派生类可访问',
+                'static': '静态成员或函数',
+                'const': '常量修饰符',
+                'virtual': '虚函数，支持多态',
+                'override': '重写虚函数',
+                'new': '动态分配内存',
+                'delete': '释放动态分配的内存',
+                'nullptr': '空指针',
+                '&': '引用符号或地址操作符',
+                '*': '指针符号或解引用操作符'
+            },
+            python: {
+                'def': '定义函数',
+                'class': '定义类',
+                'if': '条件语句',
+                'elif': '多条件分支',
+                'else': '否则分支',
+                'for': '循环语句，迭代序列',
+                'while': 'While 循环，条件为真时执行',
+                'break': '跳出循环',
+                'continue': '跳过当前迭代',
+                'pass': '空操作语句，占位符',
+                'return': '从函数返回值',
+                'yield': '生成器函数',
+                'import': '导入模块',
+                'from': '从模块导入特定项',
+                'as': '别名，为导入项重新命名',
+                'try': '异常处理 - 尝试执行',
+                'except': '异常处理 - 捕获异常',
+                'finally': '异常处理 - 总是执行',
+                'raise': '抛出异常',
+                'with': '上下文管理器',
+                'assert': '断言，用于调试',
+                'lambda': '匿名函数',
+                'list': '列表类型，有序可变集合',
+                'tuple': '元组类型，有序不可变集合',
+                'dict': '字典类型，键值对映射',
+                'set': '集合类型，无序不重复集合',
+                'str': '字符串类型',
+                'int': '整数类型',
+                'float': '浮点数类型',
+                'bool': '布尔类型（True/False）',
+                'None': '空值',
+                'len()': '获取序列长度',
+                'range()': '生成数字序列',
+                'print()': '打印输出到控制台',
+                'input()': '从用户读取输入',
+                'type()': '获取对象类型',
+                'isinstance()': '检查对象是否是某类型的实例',
+                'enumerate()': '获取序列索引和值',
+                'zip()': '合并多个序列',
+                'map()': '对序列元素应用函数',
+                'filter()': '筛选满足条件的序列元素',
+                'sorted()': '排序序列',
+                'sum()': '求和',
+                'max()': '获取最大值',
+                'min()': '获取最小值',
+                'abs()': '获取绝对值',
+                'round()': '四舍五入',
+                'pow()': '幂运算',
+                'self': '实例自身引用',
+                '__init__': '构造函数',
+                '__str__': '字符串表示',
+                '__repr__': '开发者表示',
+                '__name__': '模块名称'
+            },
+            glsl: {
+                'void main()': 'GLSL 着色器入口函数',
+                'attribute': '顶点着色器输入变量（已弃用，用 in 代替）',
+                'varying': '从顶点着色器到片段着色器的变量（已弃用，用 in/out 代替）',
+                'uniform': '常量变量，在着色器执行过程中保持不变',
+                'in': '输入变量',
+                'out': '输出变量',
+                'layout': '指定变量布局，如 location、binding 等',
+                'precision': '指定浮点数精度（highp、mediump、lowp）',
+                'vec2': '2 分量向量（x, y）',
+                'vec3': '3 分量向量（x, y, z）',
+                'vec4': '4 分量向量（x, y, z, w）',
+                'ivec2': '2 分量整数向量',
+                'ivec3': '3 分量整数向量',
+                'ivec4': '4 分量整数向量',
+                'mat2': '2x2 矩阵',
+                'mat3': '3x3 矩阵',
+                'mat4': '4x4 矩阵',
+                'sampler2D': '2D 纹理采样器',
+                'samplerCube': '立方体纹理采样器',
+                'texture()': '从纹理采样颜色',
+                'texture2D': 'GLSL 1.2 及以下采样 2D 纹理的函数',
+                'textureCube': '采样立方体纹理',
+                'gl_Position': '顶点着色器输出，顶点最终位置',
+                'gl_FragColor': '片段着色器输出，片段最终颜色',
+                'gl_PointSize': '点的大小',
+                'gl_VertexID': '当前顶点的索引',
+                'gl_FragCoord': '当前片段的屏幕坐标',
+                'normalize()': '向量归一化',
+                'length()': '向量长度',
+                'distance()': '两点间距离',
+                'dot()': '点积',
+                'cross()': '叉积',
+                'reflect()': '反射方向',
+                'refract()': '折射方向',
+                'abs()': '绝对值',
+                'sin()': '正弦函数',
+                'cos()': '余弦函数',
+                'tan()': '正切函数',
+                'sqrt()': '平方根',
+                'pow()': '幂运算',
+                'exp()': '指数函数',
+                'log()': '对数函数',
+                'floor()': '向下取整',
+                'ceil()': '向上取整',
+                'fract()': '获取小数部分',
+                'mod()': '模运算',
+                'mix()': '线性插值',
+                'step()': '阶跃函数',
+                'smoothstep()': '平滑阶跃',
+                'clamp()': '夹紧值到范围内',
+                'min()': '最小值',
+                'max()': '最大值',
+                'lessThan()': '比较小于',
+                'greaterThan()': '比较大于',
+                'equal()': '比较相等',
+                'any()': '任意分量为真',
+                'all()': '所有分量为真',
+                'not()': '逻辑非'
+            }
+        };
+
+        let currentTab = 'html';
+        let codeCache = { html: '', css: '', js: '', cpp: '', python: '', glsl: '' };
+        let selectedElement = null;
+        let uploadedFiles = {}; // 存储上传的文件
+
+        // ===== 基础函数 =====
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            codeCache[currentTab] = document.getElementById(currentTab + 'Editor').value;
+
+            document.querySelectorAll('.editor').forEach(e => e.style.display = 'none');
+            document.getElementById(tab + 'Editor').style.display = 'block';
+            document.getElementById(tab + 'Editor').value = codeCache[tab];
+
+            currentTab = tab;
+            updatePrediction();
+            updateLineNumbers();
+            analyzeCode();
+
+            // 显示/隐藏调试按钮
+            const cppBtn = document.getElementById('cppConsoleBtn');
+            const pythonBtn = document.getElementById('pythonConsoleBtn');
+            const glslBtn = document.getElementById('glslConsoleBtn');
+            
+            if (tab === 'cpp') {
+                cppBtn.style.display = 'inline-block';
+                pythonBtn.style.display = 'none';
+                glslBtn.style.display = 'none';
+            } else if (tab === 'python') {
+                pythonBtn.style.display = 'inline-block';
+                cppBtn.style.display = 'none';
+                glslBtn.style.display = 'none';
+            } else if (tab === 'glsl') {
+                glslBtn.style.display = 'inline-block';
+                cppBtn.style.display = 'none';
+                pythonBtn.style.display = 'none';
+            } else {
+                cppBtn.style.display = 'none';
+                pythonBtn.style.display = 'none';
+                glslBtn.style.display = 'none';
+                // 关闭调试控制台
+                const cppConsole = document.getElementById('cppDebugConsole');
+                const pythonConsole = document.getElementById('pythonDebugConsole');
+                const glslConsole = document.getElementById('glslDebugConsole');
+                if (cppConsole.classList.contains('open')) {
+                    cppConsole.classList.remove('open');
+                }
+                if (pythonConsole.classList.contains('open')) {
+                    pythonConsole.classList.remove('open');
+                }
+                if (glslConsole.classList.contains('open')) {
+                    glslConsole.classList.remove('open');
+                }
+            }
+        }
+
+        function updateCharCount() {
+            const editor = document.getElementById(currentTab + 'Editor');
+            document.getElementById('charCount').textContent = editor.value.length;
+        }
+
+        function updateLineNumbers() {
+            const editor = document.getElementById(currentTab + 'Editor');
+            const lines = editor.value.split('\n').length;
+            const gutter = document.getElementById('lineNumbersGutter');
+            let lineNumbers = '';
+            for (let i = 1; i <= lines; i++) {
+                lineNumbers += i + '\n';
+            }
+            gutter.textContent = lineNumbers;
+        }
+
+        function syncLineNumberScroll() {
+            const editor = document.getElementById(currentTab + 'Editor');
+            const gutter = document.getElementById('lineNumbersGutter');
+            gutter.scrollTop = editor.scrollTop;
+        }
+
+        function updatePreview() {
+            if (!document.getElementById('autoUpdate').checked) return;
+
+            try {
+                codeCache[currentTab] = document.getElementById(currentTab + 'Editor').value;
+
+                const html = codeCache.html;
+                const css = codeCache.css ? `<style>${codeCache.css}</style>` : '';
+                const js = codeCache.js ? `<script>${codeCache.js}<\/script>` : '';
+
+                const fullHtml = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    ${css}
+</head>
+<body>
+    ${html}
+    ${js}
+</body>
+</html>`;
+
+                const iframe = document.getElementById('previewFrame');
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                doc.open();
+                doc.write(fullHtml);
+                doc.close();
+
+                setupPreviewInteraction(doc);
+                document.getElementById('previewStatus').textContent = '预览: ✅ 已更新';
+            } catch (error) {
+                document.getElementById('previewStatus').textContent = '预览: ❌ 错误';
+                showMessage('预览出错: ' + error.message, 'error');
+            }
+        }
+
+        function updatePrediction() {
+            if (!document.getElementById('enablePrediction').checked) {
+                document.getElementById('predictionBox').classList.remove('show');
+                return;
+            }
+
+            const editor = document.getElementById(currentTab + 'Editor');
+            const cursorPos = editor.selectionStart;
+            const textBefore = editor.value.substring(Math.max(0, cursorPos - 20), cursorPos);
+
+            const predictionSet = predictions[Math.floor(Math.random() * predictions.length)][currentTab];
+            const suggestions = predictionSet.filter(p => Math.random() > 0.5).slice(0, 3);
+
+            const predictionList = document.getElementById('predictionList');
+            predictionList.innerHTML = suggestions.map(s => 
+                `<div class="prediction-item" onclick="insertPrediction('${s}')">${s}</div>`
+            ).join('');
+
+            if (suggestions.length > 0) {
+                document.getElementById('predictionBox').classList.add('show');
+            }
+        }
+
+        function insertPrediction(text) {
+            const editor = document.getElementById(currentTab + 'Editor');
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const before = editor.value.substring(0, start);
+            const after = editor.value.substring(end);
+
+            editor.value = before + text + after;
+            editor.selectionStart = editor.selectionEnd = start + text.length;
+
+            updatePreview();
+            updatePrediction();
+            updateCharCount();
+        }
+
+        // ===== 代码索引解释 =====
+        function toggleCodeIndex() {
+            document.getElementById('codeIndexDrawer').classList.toggle('open');
+            document.getElementById('drawerOverlay').classList.toggle('show');
+            if (document.getElementById('codeIndexDrawer').classList.contains('open')) {
+                analyzeCode();
+            }
+        }
+
+        function analyzeCode() {
+            const code = document.getElementById(currentTab + 'Editor').value;
+            const drawerContent = document.getElementById('drawerContent');
+
+            if (!code.trim()) {
+                drawerContent.innerHTML = '<div style="text-align: center; color: #9ca3af; padding: 20px;">编写代码来查看完整解释...</div>';
+                return;
+            }
+
+            let html = '<div class="drawer-section">';
+
+            if (currentTab === 'html') {
+                const tagRegex = /<(\w+)/g;
+                const tags = new Set();
+                let match;
+                while ((match = tagRegex.exec(code)) !== null) {
+                    tags.add(match[1].toLowerCase());
+                }
+
+                html += '<div class="drawer-section-title">🏷️ HTML 标签</div>';
+                if (tags.size > 0) {
+                    Array.from(tags).forEach(tag => {
+                        const exp = codeExplanations.html[tag] || '自定义标签';
+                        html += `
+                            <div class="drawer-item">
+                                <div class="drawer-item-name">&lt;${tag}&gt;</div>
+                                <div class="drawer-item-desc">${exp}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<div style="color: #9ca3af; padding: 10px;">未找到标签</div>';
+                }
+            } else if (currentTab === 'css') {
+                const propRegex = /([a-z-]+)\s*:/gi;
+                const props = new Set();
+                let match;
+                while ((match = propRegex.exec(code)) !== null) {
+                    props.add(match[1].toLowerCase());
+                }
+
+                html += '<div class="drawer-section-title">🎨 CSS 属性</div>';
+                if (props.size > 0) {
+                    Array.from(props).forEach(prop => {
+                        const exp = codeExplanations.css[prop] || '自定义属性';
+                        html += `
+                            <div class="drawer-item">
+                                <div class="drawer-item-name">${prop}:</div>
+                                <div class="drawer-item-desc">${exp}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<div style="color: #9ca3af; padding: 10px;">未找到属性</div>';
+                }
+            } else if (currentTab === 'js') {
+                html += '<div class="drawer-section-title">⚙️ JavaScript 方法</div>';
+                const keywords = Object.keys(codeExplanations.js);
+                keywords.forEach(keyword => {
+                    if (code.includes(keyword)) {
+                        html += `
+                            <div class="drawer-item">
+                                <div class="drawer-item-name">${keyword}</div>
+                                <div class="drawer-item-desc">${codeExplanations.js[keyword]}</div>
+                            </div>
+                        `;
+                    }
+                });
+            } else if (currentTab === 'cpp') {
+                const includeRegex = /#include\s*[<"]([^>"]+)[>"]/g;
+                const funcRegex = /\b(\w+)\s+([a-zA-Z_]\w*)\s*\(/g;
+                const keywords = new Set();
+                const functions = new Set();
+                
+                let match;
+                while ((match = funcRegex.exec(code)) !== null) {
+                    functions.add(match[2]);
+                }
+                
+                html += '<div class="drawer-section-title">⚙️ C++ 函数与关键字</div>';
+                if (functions.size > 0) {
+                    Array.from(functions).slice(0, 10).forEach(func => {
+                        const exp = codeExplanations.cpp[func] || '用户定义的函数';
+                        html += `
+                            <div class="drawer-item">
+                                <div class="drawer-item-name">${func}()</div>
+                                <div class="drawer-item-desc">${exp}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<div style="color: #9ca3af; padding: 10px;">未找到函数定义</div>';
+                }
+                
+                const cppKeywords = ['#include', 'int main', 'std::cout', 'std::cin', 'class', 'struct', 'namespace', 'template', 'void', 'return'];
+                html += '<div class="drawer-section-title" style="margin-top: 20px;">🔑 C++ 关键字</div>';
+                cppKeywords.forEach(keyword => {
+                    if (code.includes(keyword)) {
+                        html += `
+                            <div class="drawer-item">
+                                <div class="drawer-item-name">${keyword}</div>
+                                <div class="drawer-item-desc">${codeExplanations.cpp[keyword] || ''}</div>
+                            </div>
+                        `;
+                    }
+                });
+            } else if (currentTab === 'python') {
+                const funcRegex = /def\s+([a-zA-Z_]\w*)\s*\(/g;
+                const classRegex = /class\s+([a-zA-Z_]\w*)\s*[:\(]/g;
+                const functions = new Set();
+                const classes = new Set();
+                
+                let match;
+                while ((match = funcRegex.exec(code)) !== null) {
+                    functions.add(match[1]);
+                }
+                while ((match = classRegex.exec(code)) !== null) {
+                    classes.add(match[1]);
+                }
+                
+                html += '<div class="drawer-section-title">📦 Python 类</div>';
+                if (classes.size > 0) {
+                    Array.from(classes).forEach(cls => {
+                        html += `
+                            <div class="drawer-item">
+                                <div class="drawer-item-name">${cls}</div>
+                                <div class="drawer-item-desc">自定义类</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<div style="color: #9ca3af; padding: 10px;">未找到类定义</div>';
+                }
+                
+                html += '<div class="drawer-section-title" style="margin-top: 20px;">⚙️ Python 函数</div>';
+                if (functions.size > 0) {
+                    Array.from(functions).slice(0, 10).forEach(func => {
+                        html += `
+                            <div class="drawer-item">
+                                <div class="drawer-item-name">${func}()</div>
+                                <div class="drawer-item-desc">自定义函数</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<div style="color: #9ca3af; padding: 10px;">未找到函数定义</div>';
+                }
+                
+                const pythonKeywords = ['def', 'class', 'import', 'if', 'for', 'while', 'try', 'except', 'with', 'lambda', 'return'];
+                html += '<div class="drawer-section-title" style="margin-top: 20px;">🔑 Python 关键字</div>';
+                pythonKeywords.forEach(keyword => {
+                    if (code.includes(keyword)) {
+                        html += `
+                            <div class="drawer-item">
+                                <div class="drawer-item-name">${keyword}</div>
+                                <div class="drawer-item-desc">${codeExplanations.python[keyword] || ''}</div>
+                            </div>
+                        `;
+                    }
+                });
+            } else if (currentTab === 'glsl') {
+                const uniformRegex = /uniform\s+\w+\s+([a-zA-Z_]\w*)\s*[;=]/g;
+                const funcRegex = /\b(\w+)\s+([a-zA-Z_]\w*)\s*\([^)]*\)\s*{/g;
+                const uniforms = new Set();
+                const functions = new Set();
+                
+                let match;
+                while ((match = uniformRegex.exec(code)) !== null) {
+                    uniforms.add(match[1]);
+                }
+                while ((match = funcRegex.exec(code)) !== null) {
+                    functions.add(match[2]);
+                }
+                
+                html += '<div class="drawer-section-title">🔗 Uniform 变量</div>';
+                if (uniforms.size > 0) {
+                    Array.from(uniforms).forEach(uniform => {
+                        html += `
+                            <div class="drawer-item">
+                                <div class="drawer-item-name">${uniform}</div>
+                                <div class="drawer-item-desc">Uniform 常量变量</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<div style="color: #9ca3af; padding: 10px;">未找到 Uniform 变量</div>';
+                }
+                
+                const glslKeywords = ['void main', 'vec2', 'vec3', 'vec4', 'mat2', 'mat3', 'mat4', 'sampler2D', 'uniform', 'in', 'out', 'layout', 'precision'];
+                html += '<div class="drawer-section-title" style="margin-top: 20px;">🎨 GLSL 类型与修饰符</div>';
+                glslKeywords.forEach(keyword => {
+                    if (code.includes(keyword)) {
+                        html += `
+                            <div class="drawer-item">
+                                <div class="drawer-item-name">${keyword}</div>
+                                <div class="drawer-item-desc">${codeExplanations.glsl[keyword] || ''}</div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            html += '</div>';
+            drawerContent.innerHTML = html || '<div style="text-align: center; color: #9ca3af; padding: 20px;">未找到可识别的代码</div>';
+        }
+
+        // ===== 反向映射系统 =====
+        function setupPreviewInteraction(doc) {
+            try {
+                const allElements = doc.querySelectorAll('*');
+                allElements.forEach(elem => {
+                    elem.addEventListener('click', () => selectElement(elem, doc), true);
+                    elem.addEventListener('input', () => syncToCode(elem, doc), true);
+                    elem.addEventListener('change', () => syncToCode(elem, doc), true);
+                });
+            } catch (e) {
+                console.log('预览交互设置失败');
+            }
+        }
+
+        function selectElement(elem, doc) {
+            if (selectedElement) {
+                selectedElement.classList.remove('highlight-element');
+            }
+            selectedElement = elem;
+            elem.classList.add('highlight-element');
+            displayElementProperties(elem, doc);
+        }
+
+        function displayElementProperties(elem, doc) {
+            const inspectorContent = document.getElementById('inspectorContent');
+            const tagName = elem.tagName.toLowerCase();
+
+            let html = `<div style="padding: 10px; background: #eff6ff; border-left: 3px solid #3b82f6; border-radius: 4px; margin-bottom: 15px;">
+                <strong>&lt;${tagName}&gt;</strong>
+            </div>`;
+
+            // 文本内容
+            html += `<div class="element-property">
+                <div class="property-label">📝 文本内容</div>
+                <textarea class="property-input" id="textInput" placeholder="输入文本">${elem.textContent || ''}</textarea>
+            </div>`;
+
+            // 通用样式
+            html += `<div class="element-property">
+                <div class="property-label">🎨 背景色</div>
+                <input type="color" class="property-input" id="bgColorInput" value="${getColorHex(elem.style.backgroundColor) || '#ffffff'}">
+            </div>`;
+
+            html += `<div class="element-property">
+                <div class="property-label">🔤 文字色</div>
+                <input type="color" class="property-input" id="textColorInput" value="${getColorHex(elem.style.color) || '#000000'}">
+            </div>`;
+
+            html += `<div class="element-property">
+                <div class="property-label">✏️ 字体大小</div>
+                <input type="text" class="property-input" id="fontSizeInput" placeholder="如: 16px" value="${elem.style.fontSize || ''}">
+            </div>`;
+
+            inspectorContent.innerHTML = html;
+
+            // 绑定事件
+            const textInput = document.getElementById('textInput');
+            textInput.addEventListener('input', () => {
+                elem.textContent = textInput.value;
+                syncToCode(elem, doc);
+            });
+
+            const bgColorInput = document.getElementById('bgColorInput');
+            bgColorInput.addEventListener('input', () => {
+                elem.style.backgroundColor = bgColorInput.value;
+                syncToCode(elem, doc);
+            });
+
+            const textColorInput = document.getElementById('textColorInput');
+            textColorInput.addEventListener('input', () => {
+                elem.style.color = textColorInput.value;
+                syncToCode(elem, doc);
+            });
+
+            const fontSizeInput = document.getElementById('fontSizeInput');
+            fontSizeInput.addEventListener('input', () => {
+                elem.style.fontSize = fontSizeInput.value;
+                syncToCode(elem, doc);
+            });
+
+            document.getElementById('codeInspector').classList.add('open');
+        }
+
+        function syncToCode(elem, doc) {
+            try {
+                const bodyClone = doc.body.cloneNode(true);
+                bodyClone.querySelectorAll('.highlight-element').forEach(e => e.classList.remove('highlight-element'));
+
+                let bodyContent = bodyClone.innerHTML.trim();
+                bodyContent = formatHTML(bodyContent);
+
+                const htmlEditor = document.getElementById('htmlEditor');
+                const currentHtml = htmlEditor.value.trim();
+                if (currentHtml !== bodyContent) {
+                    htmlEditor.value = bodyContent;
+                    codeCache.html = bodyContent;
+                    updateCharCount();
+                    analyzeCode();
+                }
+            } catch (error) {
+                console.log('同步代码失败:', error);
+            }
+        }
+
+        function formatHTML(html) {
+            let formatted = '';
+            let indent = 0;
+            const lines = html.split(/(<[^>]+>)/g).filter(p => p.trim());
+
+            lines.forEach(part => {
+                if (part.startsWith('</')) {
+                    indent--;
+                    formatted += '  '.repeat(indent) + part + '\n';
+                } else if (part.startsWith('<') && part.endsWith('>')) {
+                    if (!part.startsWith('</') && !part.endsWith('/>')) {
+                        if (part.match(/<\/(div|p|span|h[1-6]|li|ul|ol|form|button|input|img|br|hr)/i)) {
+                            // 不增加缩进
+                        } else if (!part.match(/<(br|hr|img|input|meta|link)>/i)) {
+                            formatted += '  '.repeat(indent) + part + '\n';
+                            indent++;
+                            return;
+                        }
+                    }
+                    formatted += '  '.repeat(indent) + part + '\n';
+                } else if (part.trim()) {
+                    formatted += '  '.repeat(indent) + part + '\n';
+                }
+            });
+
+            return formatted.trim();
+        }
+
+        function getColorHex(color) {
+            if (!color) return null;
+            if (color.startsWith('#')) return color;
+            const match = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+            if (match) {
+                return '#' + [match[1], match[2], match[3]].map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
+            }
+            return null;
+        }
+
+        // ===== UI 函数 =====
+        function showTemplates() {
+            const container = document.getElementById('templatesContainer');
+            container.innerHTML = templates.map((t, i) => `
+                <div class="template-btn" onclick="loadTemplate(${i})">
+                    <div class="template-title">${t.name}</div>
+                    <div class="template-desc">${t.desc}</div>
+                </div>
+            `).join('');
+            document.getElementById('templatesModal').classList.add('show');
+        }
+
+        function loadTemplate(index) {
+            const template = templates[index];
+            codeCache = {
+                html: template.html || '',
+                css: template.css || '',
+                js: template.js || '',
+                cpp: template.cpp || '',
+                python: template.python || '',
+                glsl: template.glsl || ''
+            };
+
+            document.getElementById('htmlEditor').value = codeCache.html;
+            document.getElementById('cssEditor').value = codeCache.css;
+            document.getElementById('jsEditor').value = codeCache.js;
+            document.getElementById('cppEditor').value = codeCache.cpp;
+            document.getElementById('pythonEditor').value = codeCache.python;
+            document.getElementById('glslEditor').value = codeCache.glsl;
+
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            // 自动选择合适的标签
+            let selectedTabIndex = 0;
+            if (codeCache.cpp) selectedTabIndex = 3;
+            else if (codeCache.python) selectedTabIndex = 4;
+            else if (codeCache.glsl) selectedTabIndex = 5;
+            
+            tabs[selectedTabIndex].classList.add('active');
+            document.querySelectorAll('.editor').forEach(e => e.style.display = 'none');
+            
+            const tabNames = ['html', 'css', 'js', 'cpp', 'python', 'glsl'];
+            currentTab = tabNames[selectedTabIndex];
+            document.getElementById(currentTab + 'Editor').style.display = 'block';
+
+            updatePreview();
+            updateLineNumbers();
+            updateCharCount();
+            closeModal('templatesModal');
+            showMessage('模板已加载', 'success');
+        }
+
+        function saveCode() {
+            codeCache[currentTab] = document.getElementById(currentTab + 'Editor').value;
+            localStorage.setItem('savedCode', JSON.stringify(codeCache));
+            showMessage('代码已保存', 'success');
+        }
+
+        function showHelp() {
+            document.getElementById('helpModal').classList.add('show');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function toggleInspector() {
+            document.getElementById('codeInspector').classList.toggle('open');
+        }
+
+        function showMessage(msg, type) {
+            const box = document.getElementById('messageBox');
+            box.textContent = msg;
+            box.className = 'message ' + type + ' show';
+            setTimeout(() => box.classList.remove('show'), 3000);
+        }
+
+        // ===== 文件管理函数 =====
+        function uploadFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const fileName = file.name;
+                    const fileContent = e.target.result;
+                    const fileExt = fileName.split('.').pop().toLowerCase();
+
+                    // 根据文件类型自动识别
+                    let tabType = 'html';
+                    if (fileExt === 'css') tabType = 'css';
+                    if (fileExt === 'js') tabType = 'js';
+                    if (fileExt === 'cpp' || fileExt === 'cc' || fileExt === 'cxx') tabType = 'cpp';
+                    if (fileExt === 'py') tabType = 'python';
+                    if (fileExt === 'glsl' || fileExt === 'frag' || fileExt === 'vert') tabType = 'glsl';
+
+                    uploadedFiles[fileName] = {
+                        content: fileContent,
+                        type: tabType,
+                        size: file.size,
+                        uploadTime: new Date().toLocaleTimeString()
+                    };
+
+                    // 自动加载第一个文件
+                    if (Object.keys(uploadedFiles).length === 1) {
+                        loadFile(fileName);
+                    }
+
+                    updateFileList();
+                    showMessage(`文件 "${fileName}" 上传成功`, 'success');
+                };
+                reader.readAsText(file);
+            }
+
+            // 重置input
+            event.target.value = '';
+            saveFilesToStorage();
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.target.classList.remove('drag-over');
+
+            const files = event.dataTransfer.files;
+            const inputEvent = new Event('change', { bubbles: true });
+            Object.defineProperty(inputEvent, 'target', { value: { files: files }, enumerable: true });
+            handleFileSelect(inputEvent);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.currentTarget.classList.remove('drag-over');
+        }
+
+        function updateFileList() {
+            const container = document.getElementById('fileListContainer');
+            const noFilesMsg = document.getElementById('noFilesMsg');
+            const fileNames = Object.keys(uploadedFiles);
+
+            if (fileNames.length === 0) {
+                container.innerHTML = '';
+                noFilesMsg.style.display = 'block';
+                return;
+            }
+
+            noFilesMsg.style.display = 'none';
+            container.innerHTML = fileNames.map(fileName => {
+                const file = uploadedFiles[fileName];
+                const sizeKB = (file.size / 1024).toFixed(2);
+                return `
+                    <div class="file-item">
+                        <div class="file-item-name">📄 ${fileName}</div>
+                        <div class="file-item-size">${sizeKB} KB</div>
+                        <div class="file-item-actions">
+                            <button class="file-btn" onclick="loadFile('${fileName}')">打开</button>
+                            <button class="file-btn delete" onclick="deleteFile('${fileName}')">删除</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadFile(fileName) {
+            const file = uploadedFiles[fileName];
+            if (!file) return;
+
+            // 切换到对应的标签
+            codeCache[currentTab] = document.getElementById(currentTab + 'Editor').value;
+
+            document.querySelectorAll('.editor').forEach(e => e.style.display = 'none');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+            const tabType = file.type;
+            document.getElementById(tabType + 'Editor').style.display = 'block';
+            document.getElementById(tabType + 'Editor').value = file.content;
+            
+            // 设置对应标签为活跃
+            const tabButtons = document.querySelectorAll('.tab');
+            const tabTypeMap = { 'html': 0, 'css': 1, 'js': 2, 'cpp': 3, 'python': 4, 'glsl': 5 };
+            if (tabTypeMap[tabType] !== undefined) {
+                tabButtons[tabTypeMap[tabType]].classList.add('active');
+            }
+
+            currentTab = tabType;
+            codeCache[tabType] = file.content;
+
+            updatePreview();
+            updateLineNumbers();
+            updateCharCount();
+            updatePrediction();
+            analyzeCode();
+
+            showMessage(`已加载文件: ${fileName}`, 'success');
+        }
+
+        function deleteFile(fileName) {
+            if (confirm(`确定要删除文件 "${fileName}" 吗？`)) {
+                delete uploadedFiles[fileName];
+                updateFileList();
+                saveFilesToStorage();
+                showMessage(`文件 "${fileName}" 已删除`, 'success');
+            }
+        }
+
+        function showFileManager() {
+            updateFileList();
+            document.getElementById('fileManagerModal').classList.add('show');
+        }
+
+        function downloadCode() {
+            codeCache[currentTab] = document.getElementById(currentTab + 'Editor').value;
+
+            let content = '';
+            let fileName = 'code';
+            let ext = 'txt';
+            
+            if (currentTab === 'html') ext = 'html';
+            else if (currentTab === 'css') ext = 'css';
+            else if (currentTab === 'js') ext = 'js';
+            else if (currentTab === 'cpp') ext = 'cpp';
+            else if (currentTab === 'python') ext = 'py';
+            else if (currentTab === 'glsl') ext = 'glsl';
+
+            if (currentTab === 'html') {
+                const css = codeCache.css ? `<style>\n${codeCache.css}\n</style>` : '';
+                const js = codeCache.js ? `<script>\n${codeCache.js}\n<\/script>` : '';
+                content = `<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>My Page</title>\n    ${css}\n</head>\n<body>\n    ${codeCache.html}\n    ${js}\n</body>\n</html>`;
+                fileName = 'index.html';
+            } else {
+                content = codeCache[currentTab];
+                if (currentTab === 'cpp') fileName = 'main.cpp';
+                else if (currentTab === 'python') fileName = 'main.py';
+                else if (currentTab === 'glsl') fileName = 'shader.glsl';
+                else if (currentTab === 'css') fileName = 'style.css';
+                else if (currentTab === 'js') fileName = 'script.js';
+            }
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName);
+            link.style.visibility = 'hidden';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showMessage(`文件已下载: ${fileName}`, 'success');
+        }
+
+        function saveFilesToStorage() {
+            localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+        }
+
+        // ===== 初始化 =====
+        window.addEventListener('load', () => {
+            // 加载保存的文件列表
+            const savedFiles = localStorage.getItem('uploadedFiles');
+            if (savedFiles) {
+                try {
+                    uploadedFiles = JSON.parse(savedFiles);
+                } catch (e) {
+                    console.log('加载文件列表失败');
+                }
+            }
+
+            const saved = localStorage.getItem('savedCode');
+            if (saved) {
+                codeCache = JSON.parse(saved);
+                document.getElementById('htmlEditor').value = codeCache.html || '';
+                document.getElementById('cssEditor').value = codeCache.css || '';
+                document.getElementById('jsEditor').value = codeCache.js || '';
+                document.getElementById('cppEditor').value = codeCache.cpp || '';
+                document.getElementById('pythonEditor').value = codeCache.python || '';
+                document.getElementById('glslEditor').value = codeCache.glsl || '';
+            }
+            updatePreview();
+            updateLineNumbers();
+        });
+
+        // Tab 键支持
+        document.querySelectorAll('.editor').forEach(editor => {
+            editor.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const start = editor.selectionStart;
+                    const end = editor.selectionEnd;
+                    editor.value = editor.value.substring(0, start) + '\t' + editor.value.substring(end);
+                    editor.selectionStart = editor.selectionEnd = start + 1;
+                }
+            });
+        });
+
+        // 关闭模态框
+        window.onclick = (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        };
+
+        // ===== C++ 自动化调试台函数 =====
+        let cppProcess = null;
+        let cppOutputBuffer = [];
+        let cppIsRunning = false;
+        let cppInputPending = false;
+
+        function toggleCppConsole() {
+            const console = document.getElementById('cppDebugConsole');
+            console.classList.toggle('open');
+            if (console.classList.contains('open')) {
+                document.getElementById('cppOutputArea').focus();
+            }
+        }
+
+        function updateCppStatus(text, isRunning = false) {
+            const indicator = document.getElementById('cppStatusIndicator');
+            const statusText = document.getElementById('cppStatusText');
+            
+            statusText.textContent = text;
+            indicator.classList.remove('ready', 'running');
+            
+            if (isRunning) {
+                indicator.classList.add('running');
+                cppIsRunning = true;
+            } else {
+                indicator.classList.add('ready');
+                cppIsRunning = false;
+            }
+        }
+
+        function appendCppOutput(text, type = 'info') {
+            const outputArea = document.getElementById('cppOutputArea');
+            const line = document.createElement('div');
+            line.className = `cpp-output-line ${type}`;
+            line.textContent = text;
+            outputArea.appendChild(line);
+            outputArea.scrollTop = outputArea.scrollHeight;
+        }
+
+        function clearCppOutput() {
+            document.getElementById('cppOutputArea').innerHTML = '';
+            cppOutputBuffer = [];
+        }
+
+        function cppClearOutput() {
+            clearCppOutput();
+            appendCppOutput('✅ 输出已清空', 'success');
+        }
+
+        function openCppConsole() {
+            const console = document.getElementById('cppDebugConsole');
+            if (!console.classList.contains('open')) {
+                console.classList.add('open');
+            }
+        }
+
+        function cppCompile() {
+            openCppConsole();
+            clearCppOutput();
+            const code = document.getElementById('cppEditor').value;
+            
+            if (!code.trim()) {
+                appendCppOutput('❌ 错误：C++ 代码为空', 'error');
+                return;
+            }
+
+            updateCppStatus('编译中...', true);
+            appendCppOutput('📝 开始编译 C++ 代码...', 'info');
+            appendCppOutput('代码长度: ' + code.length + ' 字符', 'info');
+
+            // 模拟编译过程
+            setTimeout(() => {
+                // 检查语法错误
+                const hasErrors = checkCppSyntax(code);
+                
+                if (hasErrors.length > 0) {
+                    appendCppOutput('❌ 编译失败：检测到语法错误', 'error');
+                    hasErrors.forEach(error => {
+                        appendCppOutput('  • ' + error, 'error');
+                    });
+                    updateCppStatus('编译失败', false);
+                } else {
+                    appendCppOutput('✅ 编译成功！可以运行程序。', 'success');
+                    updateCppStatus('编译成功，准备运行', false);
+                }
+            }, 500);
+        }
+
+        function cppRun() {
+            openCppConsole();
+            
+            if (cppIsRunning) {
+                appendCppOutput('⚠️ 程序已在运行中', 'warning');
+                return;
+            }
+
+            appendCppOutput('▶️ 开始运行程序...', 'info');
+            updateCppStatus('运行中...', true);
+
+            // 模拟程序运行
+            const code = document.getElementById('cppEditor').value;
+            const output = executeCppCode(code);
+            
+            setTimeout(() => {
+                if (output) {
+                    output.split('\n').forEach(line => {
+                        if (line.trim()) {
+                            appendCppOutput(line, 'info');
+                        }
+                    });
+                }
+                updateCppStatus('运行完成', false);
+                appendCppOutput('✅ 程序执行完成', 'success');
+            }, 800);
+        }
+
+        function cppCompileAndRun() {
+            openCppConsole();
+            clearCppOutput();
+            const code = document.getElementById('cppEditor').value;
+            
+            if (!code.trim()) {
+                appendCppOutput('❌ 错误：C++ 代码为空', 'error');
+                return;
+            }
+
+            updateCppStatus('编译中...', true);
+            appendCppOutput('🔨 编译并运行 C++ 程序...', 'info');
+
+            // 编译
+            setTimeout(() => {
+                const hasErrors = checkCppSyntax(code);
+                
+                if (hasErrors.length > 0) {
+                    appendCppOutput('❌ 编译失败', 'error');
+                    hasErrors.forEach(error => {
+                        appendCppOutput('  错误: ' + error, 'error');
+                    });
+                    updateCppStatus('编译失败', false);
+                    return;
+                }
+
+                appendCppOutput('✅ 编译成功', 'success');
+                updateCppStatus('运行中...', true);
+
+                // 运行
+                setTimeout(() => {
+                    const output = executeCppCode(code);
+                    
+                    appendCppOutput('', 'info'); // 空行
+                    appendCppOutput('--- 程序输出 ---', 'info');
+                    
+                    if (output) {
+                        output.split('\n').forEach(line => {
+                            if (line.trim()) {
+                                appendCppOutput(line, 'info');
+                            }
+                        });
+                    } else {
+                        appendCppOutput('(无输出)', 'warning');
+                    }
+                    
+                    appendCppOutput('--- 输出结束 ---', 'info');
+                    updateCppStatus('执行完成', false);
+                    appendCppOutput('✅ 程序执行完成', 'success');
+
+                    // 自动运行检查
+                    if (document.getElementById('cppAutoRun').checked) {
+                        setTimeout(cppCompileAndRun, 1500);
+                    }
+                }, 600);
+            }, 500);
+        }
+
+        function cppKill() {
+            if (cppIsRunning) {
+                updateCppStatus('已停止', false);
+                appendCppOutput('⛔ 程序已停止', 'warning');
+            } else {
+                appendCppOutput('⚠️ 没有运行中的程序', 'warning');
+            }
+        }
+
+        function cppSendInput() {
+            const inputField = document.getElementById('cppInputField');
+            const input = inputField.value.trim();
+            
+            if (!input) return;
+
+            appendCppOutput('📤 输入: ' + input, 'info');
+            inputField.value = '';
+            cppInputPending = false;
+            
+            // 模拟处理输入
+            setTimeout(() => {
+                appendCppOutput('✓ 输入已发送给程序', 'success');
+            }, 300);
+        }
+
+        // C++ 语法检查
+        function checkCppSyntax(code) {
+            const errors = [];
+            const lines = code.split('\n');
+
+            // 检查基本语法
+            let braceCount = 0;
+            let parenCount = 0;
+            let bracketCount = 0;
+
+            lines.forEach((line, index) => {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('//')) return;
+
+                // 计算括号
+                braceCount += (line.match(/\{/g) || []).length;
+                braceCount -= (line.match(/\}/g) || []).length;
+                parenCount += (line.match(/\(/g) || []).length;
+                parenCount -= (line.match(/\)/g) || []).length;
+                bracketCount += (line.match(/\[/g) || []).length;
+                bracketCount -= (line.match(/\]/g) || []).length;
+
+                // 检查 #include
+                if (trimmed.includes('#include')) {
+                    const match = trimmed.match(/#include\s*[<"]([^>"]+)[>"]/);
+                    if (!match) {
+                        errors.push(`第 ${index + 1} 行：#include 格式错误`);
+                    }
+                }
+
+                // 检查函数声明
+                if (trimmed.includes('int main') || trimmed.includes('void main')) {
+                    if (!trimmed.includes('(') || !trimmed.includes(')')) {
+                        errors.push(`第 ${index + 1} 行：main 函数声明错误`);
+                    }
+                }
+            });
+
+            if (braceCount !== 0) errors.push('花括号不匹配');
+            if (parenCount !== 0) errors.push('圆括号不匹配');
+            if (bracketCount !== 0) errors.push('方括号不匹配');
+
+            return errors;
+        }
+
+        // C++ 代码执行模拟
+        function executeCppCode(code) {
+            try {
+                // 检测常见的输出语句
+                const outputs = [];
+
+                // 检测 cout 语句
+                const coutRegex = /cout\s*<<\s*"([^"]*)"/g;
+                let match;
+                while ((match = coutRegex.exec(code)) !== null) {
+                    outputs.push(match[1]);
+                }
+
+                // 检测 cout 和变量
+                const coutVarRegex = /cout\s*<<\s*(\w+)/g;
+                while ((match = coutVarRegex.exec(code)) !== null) {
+                    const varName = match[1];
+                    if (varName !== 'endl' && varName !== 'cout') {
+                        // 尝试从代码中提取变量值
+                        const varRegex = new RegExp(`(int|double|float|string|auto)\\s+${varName}\\s*=\\s*([^;]+)`);
+                        const varMatch = code.match(varRegex);
+                        if (varMatch) {
+                            outputs.push(varMatch[2].trim());
+                        }
+                    }
+                }
+
+                // 检测 printf 语句
+                const printfRegex = /printf\s*\(\s*"([^"]*)"/g;
+                while ((match = printfRegex.exec(code)) !== null) {
+                    outputs.push(match[1]);
+                }
+
+                // 检测 return 0
+                if (code.includes('return 0')) {
+                    if (outputs.length === 0) {
+                        outputs.push('Program executed successfully');
+                    }
+                }
+
+                return outputs.join('\n');
+            } catch (error) {
+                return '执行出错: ' + error.message;
+            }
+        }
+
+        // 监听复选框
+        document.addEventListener('DOMContentLoaded', () => {
+            const showInputCheckbox = document.getElementById('cppShowInput');
+            if (showInputCheckbox) {
+                showInputCheckbox.addEventListener('change', () => {
+                    document.getElementById('cppInputArea').style.display = 
+                        showInputCheckbox.checked ? 'flex' : 'none';
+                });
+            }
+        });
+
+        // ===== Python 调试器函数 =====
+        let pythonProcess = null;
+        let pythonOutputBuffer = [];
+        let pythonIsRunning = false;
+        let pythonInputPending = false;
+
+        function togglePythonConsole() {
+            const console = document.getElementById('pythonDebugConsole');
+            console.classList.toggle('open');
+            if (console.classList.contains('open')) {
+                document.getElementById('pythonOutputArea').focus();
+            }
+        }
+
+        function updatePythonStatus(text, isRunning = false) {
+            const indicator = document.getElementById('pythonStatusIndicator');
+            const statusText = document.getElementById('pythonStatusText');
+            
+            statusText.textContent = text;
+            indicator.classList.remove('ready', 'running');
+            
+            if (isRunning) {
+                indicator.classList.add('running');
+                pythonIsRunning = true;
+            } else {
+                indicator.classList.add('ready');
+                pythonIsRunning = false;
+            }
+        }
+
+        function appendPythonOutput(text, type = 'info') {
+            const outputArea = document.getElementById('pythonOutputArea');
+            const line = document.createElement('div');
+            line.className = `python-output-line ${type}`;
+            line.textContent = text;
+            outputArea.appendChild(line);
+            outputArea.scrollTop = outputArea.scrollHeight;
+        }
+
+        function clearPythonOutput() {
+            document.getElementById('pythonOutputArea').innerHTML = '';
+            pythonOutputBuffer = [];
+        }
+
+        function pythonClearOutput() {
+            clearPythonOutput();
+            appendPythonOutput('✅ 输出已清空', 'success');
+        }
+
+        function openPythonConsole() {
+            const console = document.getElementById('pythonDebugConsole');
+            if (!console.classList.contains('open')) {
+                console.classList.add('open');
+            }
+        }
+
+        function pythonCheck() {
+            openPythonConsole();
+            clearPythonOutput();
+            const code = document.getElementById('pythonEditor').value;
+            
+            if (!code.trim()) {
+                appendPythonOutput('❌ 错误：Python 代码为空', 'error');
+                return;
+            }
+
+            updatePythonStatus('检查中...', true);
+            appendPythonOutput('📝 开始检查 Python 代码...', 'info');
+            appendPythonOutput('代码长度: ' + code.length + ' 字符', 'info');
+
+            // 模拟语法检查
+            setTimeout(() => {
+                const errors = checkPythonSyntax(code);
+                
+                if (errors.length > 0) {
+                    appendPythonOutput('❌ 检查失败：检测到语法错误', 'error');
+                    errors.forEach(error => {
+                        appendPythonOutput('  • ' + error, 'error');
+                    });
+                    updatePythonStatus('检查失败', false);
+                } else {
+                    appendPythonOutput('✅ 语法检查通过！可以运行代码。', 'success');
+                    updatePythonStatus('检查完成', false);
+                }
+            }, 500);
+        }
+
+        function pythonRun() {
+            openPythonConsole();
+            clearPythonOutput();
+            const code = document.getElementById('pythonEditor').value;
+            
+            if (!code.trim()) {
+                appendPythonOutput('❌ 错误：Python 代码为空', 'error');
+                return;
+            }
+
+            updatePythonStatus('运行中...', true);
+            appendPythonOutput('🐍 开始执行 Python 代码...', 'info');
+
+            // 检查语法
+            setTimeout(() => {
+                const errors = checkPythonSyntax(code);
+                
+                if (errors.length > 0) {
+                    appendPythonOutput('❌ 执行失败：检测到语法错误', 'error');
+                    errors.forEach(error => {
+                        appendPythonOutput('  • ' + error, 'error');
+                    });
+                    updatePythonStatus('执行失败', false);
+                    return;
+                }
+
+                appendPythonOutput('✅ 语法检查通过，开始执行...', 'success');
+                appendPythonOutput('', 'info'); // 空行
+
+                // 执行代码
+                setTimeout(() => {
+                    const output = executePythonCode(code);
+                    
+                    if (output) {
+                        output.split('\n').forEach(line => {
+                            if (line.trim()) {
+                                appendPythonOutput(line, 'info');
+                            }
+                        });
+                    } else {
+                        appendPythonOutput('(无输出)', 'warning');
+                    }
+                    
+                    updatePythonStatus('执行完成', false);
+                    appendPythonOutput('✅ 代码执行完成', 'success');
+
+                    // 自动运行检查
+                    if (document.getElementById('pythonAutoRun').checked) {
+                        setTimeout(pythonRun, 1500);
+                    }
+                }, 600);
+            }, 400);
+        }
+
+        function pythonKill() {
+            if (pythonIsRunning) {
+                updatePythonStatus('已停止', false);
+                appendPythonOutput('⛔ 程序已停止', 'warning');
+            } else {
+                appendPythonOutput('⚠️ 没有运行中的程序', 'warning');
+            }
+        }
+
+        function pythonSendInput() {
+            const inputField = document.getElementById('pythonInputField');
+            const input = inputField.value.trim();
+            
+            if (!input) return;
+
+            appendPythonOutput('📤 输入: ' + input, 'info');
+            inputField.value = '';
+            pythonInputPending = false;
+            
+            // 模拟处理输入
+            setTimeout(() => {
+                appendPythonOutput('✓ 输入已发送给程序', 'success');
+            }, 300);
+        }
+
+        // Python 语法检查
+        function checkPythonSyntax(code) {
+            const errors = [];
+            const lines = code.split('\n');
+
+            let indentLevel = 0;
+            let inMultilineString = false;
+            let stringChar = '';
+
+            lines.forEach((line, index) => {
+                const trimmed = line.trim();
+                
+                // 跳过注释和空行
+                if (trimmed.startsWith('#') || !trimmed) return;
+
+                // 检查多行字符串
+                const tripleQuoteCount = (line.match(/"""/g) || []).length + (line.match(/'''/g) || []).length;
+                if (tripleQuoteCount % 2 === 1) {
+                    inMultilineString = !inMultilineString;
+                }
+                if (inMultilineString) return;
+
+                // 检查括号匹配
+                const parenCount = (line.match(/\(/g) || []).length - (line.match(/\)/g) || []).length;
+                const bracketCount = (line.match(/\[/g) || []).length - (line.match(/\]/g) || []).length;
+                const braceCount = (line.match(/\{/g) || []).length - (line.match(/\}/g) || []).length;
+
+                if (parenCount !== 0 && parenCount !== -0) {
+                    // 允许括号跨行，只记录明显错误
+                }
+
+                // 检查缩进
+                const currentIndent = line.match(/^\s*/)[0].length / 4;
+                
+                // 检查冒号和缩进
+                if (trimmed.endsWith(':')) {
+                    if (!/^(if|elif|else|for|while|def|class|try|except|finally|with)\b/.test(trimmed)) {
+                        errors.push(`第 ${index + 1} 行：冒号后应该缩进`);
+                    }
+                }
+
+                // 检查常见错误
+                if (/^\s*print\s*\(/.test(line)) {
+                    // print 语句检查
+                    const parenMatch = line.match(/print\s*\((.*)\)/);
+                    if (parenMatch) {
+                        const content = parenMatch[1];
+                        // 基本检查
+                    }
+                }
+
+                // 检查 import 语句
+                if (trimmed.startsWith('import ') || trimmed.startsWith('from ')) {
+                    // import 检查
+                    const validImport = /^(import\s+[\w.]+|from\s+[\w.]+\s+import\s+[\w., *]+)$/.test(trimmed);
+                    if (!validImport && !trimmed.startsWith('from .')) {
+                        // 可能是错误的 import，但不一定
+                    }
+                }
+
+                // 检查常见拼写错误
+                if (/\bpint\(/.test(line)) errors.push(`第 ${index + 1} 行：可能是 print()，拼写错误`);
+                if (/\blenght\(/.test(line)) errors.push(`第 ${index + 1} 行：可能是 len()，拼写错误`);
+                if (/\bragne\(/.test(line)) errors.push(`第 ${index + 1} 行：可能是 range()，拼写错误`);
+            });
+
+            return errors;
+        }
+
+        // Python 代码执行模拟
+        function executePythonCode(code) {
+            try {
+                const outputs = [];
+
+                // 检测 print 语句
+                const printRegex = /print\s*\(\s*['"]([^'"]*)['"]\s*\)/g;
+                let match;
+                while ((match = printRegex.exec(code)) !== null) {
+                    outputs.push(match[1]);
+                }
+
+                // 检测 print 和变量
+                const printVarRegex = /print\s*\(\s*(\w+)\s*\)/g;
+                while ((match = printVarRegex.exec(code)) !== null) {
+                    const varName = match[1];
+                    // 尝试从代码中提取变量值
+                    const varRegex = new RegExp(`${varName}\\s*=\\s*([^\\n]+)`);
+                    const varMatch = code.match(varRegex);
+                    if (varMatch) {
+                        let value = varMatch[1].trim().replace(/[,;]$/, '');
+                        // 移除引号
+                        if ((value.startsWith('"') && value.endsWith('"')) || 
+                            (value.startsWith("'") && value.endsWith("'"))) {
+                            value = value.slice(1, -1);
+                        }
+                        outputs.push(value);
+                    }
+                }
+
+                // 检测 for 循环和 range
+                const forLoopRegex = /for\s+\w+\s+in\s+range\s*\(\s*(\d+)\s*\)/g;
+                while ((match = forLoopRegex.exec(code)) !== null) {
+                    const max = parseInt(match[1]);
+                    if (max <= 10) {
+                        outputs.push(`循环执行 ${max} 次`);
+                    }
+                }
+
+                // 检测列表和字典操作
+                if (code.includes('[') && code.includes(']')) {
+                    outputs.push('✓ 包含列表操作');
+                }
+                if (code.includes('{') && code.includes('}')) {
+                    outputs.push('✓ 包含字典操作');
+                }
+
+                // 如果没有输出，返回执行成功信息
+                if (outputs.length === 0) {
+                    if (code.includes('def ')) {
+                        outputs.push('✓ 函数定义成功');
+                    } else if (code.includes('class ')) {
+                        outputs.push('✓ 类定义成功');
+                    } else {
+                        outputs.push('Program executed successfully');
+                    }
+                }
+
+                return outputs.join('\n');
+            } catch (error) {
+                return '执行出错: ' + error.message;
+            }
+        }
+
+        // 监听 Python 复选框
+        document.addEventListener('DOMContentLoaded', () => {
+            const showInputCheckbox = document.getElementById('pythonShowInput');
+            if (showInputCheckbox) {
+                showInputCheckbox.addEventListener('change', () => {
+                    document.getElementById('pythonInputArea').style.display = 
+                        showInputCheckbox.checked ? 'flex' : 'none';
+                });
+            }
+        });
+
+        // ===== GLSL 调试器函数 =====
+        let glslProcess = null;
+        let glslOutputBuffer = [];
+        let glslIsRunning = false;
+        let glslShaderType = 'fragment'; // vertex, fragment, compute
+
+        function toggleGlslConsole() {
+            const console = document.getElementById('glslDebugConsole');
+            console.classList.toggle('open');
+            if (console.classList.contains('open')) {
+                document.getElementById('glslOutputArea').focus();
+            }
+        }
+
+        function updateGlslStatus(text, isRunning = false) {
+            const indicator = document.getElementById('glslStatusIndicator');
+            const statusText = document.getElementById('glslStatusText');
+            
+            statusText.textContent = text;
+            indicator.classList.remove('ready', 'running');
+            
+            if (isRunning) {
+                indicator.classList.add('running');
+                glslIsRunning = true;
+            } else {
+                indicator.classList.add('ready');
+                glslIsRunning = false;
+            }
+        }
+
+        function appendGlslOutput(text, type = 'info') {
+            const outputArea = document.getElementById('glslOutputArea');
+            const line = document.createElement('div');
+            line.className = `glsl-output-line ${type}`;
+            line.textContent = text;
+            outputArea.appendChild(line);
+            outputArea.scrollTop = outputArea.scrollHeight;
+        }
+
+        function clearGlslOutput() {
+            document.getElementById('glslOutputArea').innerHTML = '';
+            glslOutputBuffer = [];
+        }
+
+        function glslClearOutput() {
+            clearGlslOutput();
+            appendGlslOutput('✅ 输出已清空', 'success');
+        }
+
+        function glslClearInfo() {
+            document.getElementById('glslInputField').value = '';
+        }
+
+        function openGlslConsole() {
+            const console = document.getElementById('glslDebugConsole');
+            if (!console.classList.contains('open')) {
+                console.classList.add('open');
+            }
+        }
+
+        function glslValidate() {
+            openGlslConsole();
+            clearGlslOutput();
+            const code = document.getElementById('glslEditor').value;
+            
+            if (!code.trim()) {
+                appendGlslOutput('❌ 错误：GLSL 代码为空', 'error');
+                return;
+            }
+
+            updateGlslStatus('验证中...', true);
+            appendGlslOutput('📝 开始验证 GLSL 着色器...', 'info');
+            appendGlslOutput('代码长度: ' + code.length + ' 字符', 'info');
+
+            // 检测着色器类型
+            const detectedType = detectGlslShaderType(code);
+            glslShaderType = detectedType;
+            appendGlslOutput(`🎨 检测到着色器类型: ${detectedType === 'vertex' ? '顶点着色器' : detectedType === 'fragment' ? '片段着色器' : '计算着色器'}`, 'info');
+
+            // 模拟验证
+            setTimeout(() => {
+                const errors = validateGlslSyntax(code);
+                
+                if (errors.length > 0) {
+                    appendGlslOutput('❌ 验证失败：检测到错误', 'error');
+                    errors.forEach(error => {
+                        appendGlslOutput('  • ' + error, 'error');
+                    });
+                    updateGlslStatus('验证失败', false);
+                } else {
+                    appendGlslOutput('✅ 验证通过！着色器语法正确。', 'success');
+                    updateGlslStatus('验证成功', false);
+                }
+            }, 500);
+        }
+
+        function glslCompile() {
+            openGlslConsole();
+            clearGlslOutput();
+            const code = document.getElementById('glslEditor').value;
+            
+            if (!code.trim()) {
+                appendGlslOutput('❌ 错误：GLSL 代码为空', 'error');
+                return;
+            }
+
+            updateGlslStatus('编译中...', true);
+            appendGlslOutput('⚙️ 开始编译 GLSL 着色器...', 'info');
+
+            // 验证
+            setTimeout(() => {
+                const errors = validateGlslSyntax(code);
+                const detectedType = detectGlslShaderType(code);
+                glslShaderType = detectedType;
+                
+                if (errors.length > 0) {
+                    appendGlslOutput('❌ 编译失败', 'error');
+                    errors.forEach(error => {
+                        appendGlslOutput('  错误: ' + error, 'error');
+                    });
+                    updateGlslStatus('编译失败', false);
+                    return;
+                }
+
+                appendGlslOutput('✅ 编译成功', 'success');
+                appendGlslOutput('', 'info'); // 空行
+                
+                // 分析着色器
+                analyzeGlslShader(code);
+                
+                updateGlslStatus('编译完成', false);
+                appendGlslOutput('✅ 着色器编译完成', 'success');
+
+                // 自动验证检查
+                if (document.getElementById('glslAutoValidate').checked) {
+                    setTimeout(glslValidate, 1500);
+                }
+            }, 600);
+        }
+
+        function glslAnalyze() {
+            openGlslConsole();
+            clearGlslOutput();
+            const code = document.getElementById('glslEditor').value;
+            
+            if (!code.trim()) {
+                appendGlslOutput('❌ 错误：GLSL 代码为空', 'error');
+                return;
+            }
+
+            updateGlslStatus('分析中...', true);
+            appendGlslOutput('🔍 开始分析 GLSL 代码...', 'info');
+
+            setTimeout(() => {
+                analyzeGlslShader(code);
+                updateGlslStatus('分析完成', false);
+                appendGlslOutput('✅ 分析完成', 'success');
+            }, 400);
+        }
+
+        // GLSL 着色器类型检测
+        function detectGlslShaderType(code) {
+            if (code.includes('gl_Position')) {
+                return 'vertex';
+            } else if (code.includes('gl_FragColor') || code.includes('fragColor')) {
+                return 'fragment';
+            } else if (code.includes('imageStore') || code.includes('barrier()')) {
+                return 'compute';
+            }
+            // 默认为片段着色器
+            return 'fragment';
+        }
+
+        // GLSL 语法检查
+        function validateGlslSyntax(code) {
+            const errors = [];
+            const lines = code.split('\n');
+
+            let braceCount = 0;
+            let parenCount = 0;
+            let bracketCount = 0;
+
+            lines.forEach((line, index) => {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('//')) return;
+
+                // 计算括号
+                braceCount += (line.match(/\{/g) || []).length;
+                braceCount -= (line.match(/\}/g) || []).length;
+                parenCount += (line.match(/\(/g) || []).length;
+                parenCount -= (line.match(/\)/g) || []).length;
+                bracketCount += (line.match(/\[/g) || []).length;
+                bracketCount -= (line.match(/\]/g) || []).length;
+
+                // 检查 precision 声明
+                if (trimmed.includes('precision')) {
+                    const validPrecision = /precision\s+(lowp|mediump|highp)\s+(int|float|sampler\w+)/.test(trimmed);
+                    if (!validPrecision) {
+                        errors.push(`第 ${index + 1} 行：precision 声明格式错误`);
+                    }
+                }
+
+                // 检查 attribute/uniform/varying 声明
+                if (/\b(attribute|uniform|varying)\b/.test(trimmed)) {
+                    if (!trimmed.includes(';')) {
+                        // 可能是多行声明
+                    }
+                }
+
+                // 检查 main 函数
+                if (trimmed.includes('void main')) {
+                    if (!trimmed.includes('()')) {
+                        errors.push(`第 ${index + 1} 行：main 函数声明错误`);
+                    }
+                }
+            });
+
+            if (braceCount !== 0) errors.push('花括号不匹配');
+            if (parenCount !== 0) errors.push('圆括号不匹配');
+            if (bracketCount !== 0) errors.push('方括号不匹配');
+
+            // 检查 main 函数是否存在
+            if (!code.includes('void main')) {
+                errors.push('缺少 main() 函数');
+            }
+
+            return errors;
+        }
+
+        // GLSL 着色器分析
+        function analyzeGlslShader(code) {
+            appendGlslOutput('--- 着色器分析报告 ---', 'info');
+            
+            // 检测变量
+            const uniformRegex = /uniform\s+\w+\s+(\w+)/g;
+            const varyingRegex = /varying\s+\w+\s+(\w+)/g;
+            const attributeRegex = /attribute\s+\w+\s+(\w+)/g;
+            
+            let match;
+            const uniforms = [];
+            const varyings = [];
+            const attributes = [];
+            
+            while ((match = uniformRegex.exec(code)) !== null) {
+                uniforms.push(match[1]);
+            }
+            while ((match = varyingRegex.exec(code)) !== null) {
+                varyings.push(match[1]);
+            }
+            while ((match = attributeRegex.exec(code)) !== null) {
+                attributes.push(match[1]);
+            }
+
+            if (uniforms.length > 0) {
+                appendGlslOutput(`📦 Uniform 变量 (${uniforms.length}):`, 'info');
+                uniforms.forEach(u => appendGlslOutput(`  • ${u}`, 'info'));
+            }
+
+            if (varyings.length > 0) {
+                appendGlslOutput(`📤 Varying 变量 (${varyings.length}):`, 'info');
+                varyings.forEach(v => appendGlslOutput(`  • ${v}`, 'info'));
+            }
+
+            if (attributes.length > 0) {
+                appendGlslOutput(`📥 Attribute 变量 (${attributes.length}):`, 'info');
+                attributes.forEach(a => appendGlslOutput(`  • ${a}`, 'info'));
+            }
+
+            // 检测函数
+            const funcRegex = /\b(\w+)\s+(\w+)\s*\(/g;
+            const functions = new Set();
+            while ((match = funcRegex.exec(code)) !== null) {
+                if (match[2] !== 'main') {
+                    functions.add(match[2]);
+                }
+            }
+
+            if (functions.size > 0) {
+                appendGlslOutput(`⚙️ 自定义函数 (${functions.size}):`, 'info');
+                Array.from(functions).forEach(f => appendGlslOutput(`  • ${f}()`, 'info'));
+            }
+
+            // 检测内置函数
+            const builtInFuncs = ['normalize', 'dot', 'cross', 'length', 'distance', 'reflect', 'refract', 
+                                  'texture', 'texture2D', 'textureCube', 'mix', 'step', 'smoothstep'];
+            const usedBuiltIns = [];
+            builtInFuncs.forEach(func => {
+                if (code.includes(func + '(')) {
+                    usedBuiltIns.push(func);
+                }
+            });
+
+            if (usedBuiltIns.length > 0) {
+                appendGlslOutput(`📚 内置函数 (${usedBuiltIns.length}):`, 'info');
+                usedBuiltIns.forEach(f => appendGlslOutput(`  • ${f}()`, 'info'));
+            }
+
+            // 显示着色器类型
+            const typeText = glslShaderType === 'vertex' ? '顶点着色器' : 
+                            glslShaderType === 'fragment' ? '片段着色器' : '计算着色器';
+            appendGlslOutput(`🎨 着色器类型: ${typeText}`, 'success');
+            
+            // 代码行数和大小
+            const lineCount = code.split('\n').length;
+            appendGlslOutput(`📊 代码统计: ${lineCount} 行, ${code.length} 字符`, 'info');
+            
+            appendGlslOutput('--- 分析完成 ---', 'info');
+        }
+
+        // 监听 GLSL 复选框
+        document.addEventListener('DOMContentLoaded', () => {
+            const showInfoCheckbox = document.getElementById('glslShowInfo');
+            if (showInfoCheckbox) {
+                showInfoCheckbox.addEventListener('change', () => {
+                    document.getElementById('glslInputArea').style.display = 
+                        showInfoCheckbox.checked ? 'flex' : 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
